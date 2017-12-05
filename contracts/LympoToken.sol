@@ -29,21 +29,21 @@ library SafeMath {
 contract LympoToken {
     using SafeMath for uint;
     // Public variables of the token
-	string constant public standard = "ERC20";
+    string constant public standard = "ERC20";
     string constant public name = "Lympo tokens";
-	string constant public symbol = "LYM";
-	uint8 constant public decimals = 18;
-	uint public totalSupply = 1000000000e18; // Total supply of 1 billion Lympo Tokens
+    string constant public symbol = "LYM";
+    uint8 constant public decimals = 18;
+    uint public totalSupply = 1000000000e18; // Total supply of 1 billion Lympo Tokens
     uint constant public tokensPreICO = 150000000e18; // 15%
-	uint constant public tokensICO = 500000000e18; // 50%
-	uint constant public teamReserve = 130000000e18; // 13%
+    uint constant public tokensICO = 500000000e18; // 50%
+    uint constant public teamReserve = 130000000e18; // 13%
     uint constant public ecosystemReserve = 220000000e18; // 22%
     uint constant public ecoLock23 = 146652000e18; // 2/3 of ecosystem reserve
     uint constant public ecoLock13 = 73326000e18; // 1/3 of ecosystem reserve
     uint constant public startTime = 1520899199; // Time after ICO, when tokens became transferable. Monday, 12 March 2018 23:59:59 GMT
     uint public lockReleaseDate1year;
     uint public lockReleaseDate2year;
-	address public ownerAddr;
+    address public ownerAddr;
     address public ecosystemAddr;
     bool burned;
 
@@ -61,27 +61,27 @@ contract LympoToken {
     }
     //------------------------
 	
-	// Array with all balances
+    // Array with all balances
     mapping (address => uint) public balances;
     mapping (address => mapping (address => uint)) public allowed;
-    
-    // Public event on the blockchain that will notify clients 
-	event Transfer(address indexed from, address indexed to, uint value);
-	event Approval(address indexed _owner, address indexed spender, uint value);
-	event Burned(uint amount);
-	
-	//  Initializes contract with initial supply tokens to the creator of the contract
-	function LympoToken(address _ownerAddr, address _ecosystemAddr) {
-		ownerAddr = _ownerAddr;
+
+    // Public event on the blockchain that will notify clients
+    event Transfer(address indexed from, address indexed to, uint value);
+    event Approval(address indexed _owner, address indexed spender, uint value);
+    event Burned(uint amount);
+
+    // Initializes contract with initial supply tokens to the creator of the contract
+    function LympoToken(address _ownerAddr, address _ecosystemAddr) {
+        ownerAddr = _ownerAddr;
         ecosystemAddr = _ecosystemAddr;
         lockReleaseDate1year = startTime + 1 years; // 2019
         lockReleaseDate2year = startTime + 2 years; // 2020
-		balances[ownerAddr] = totalSupply; // Give the owner all initial tokens
-	}
+        balances[ownerAddr] = totalSupply; // Give the owner all initial tokens
+    }
 	
-	//  Send some of your tokens to a given address
-	function transfer(address _to, uint _value) returns(bool) {
-		require(current() >= startTime); // Check if the crowdsale is already over
+    // Send some of your tokens to a given address
+    function transfer(address _to, uint _value) returns(bool) {
+        require(current() >= startTime); // Check if the crowdsale is already over
 
         // prevent the owner of spending his share of tokens for team within first the two year
         if (msg.sender == ownerAddr && current() < lockReleaseDate2year)
@@ -93,17 +93,17 @@ contract LympoToken {
         else if (msg.sender == ecosystemAddr && current() < lockReleaseDate2year)
             require(balances[msg.sender].sub(_value) >= ecoLock13);
 
-	    balances[msg.sender] = balances[msg.sender].sub(_value); // Subtract from the sender
-		balances[_to] = balances[_to].add(_value); // Add the same to the recipient
-		Transfer(msg.sender, _to, _value); // Notify anyone listening that this transfer took place
-		return true;
-	}
+        balances[msg.sender] = balances[msg.sender].sub(_value); // Subtract from the sender
+        balances[_to] = balances[_to].add(_value); // Add the same to the recipient
+        Transfer(msg.sender, _to, _value); // Notify anyone listening that this transfer took place
+        return true;
+    }
 	
-    //  A contract or person attempts to get the tokens of somebody else.
-    //  This is only allowed if the token holder approved.
+    // A contract or person attempts to get the tokens of somebody else.
+    // This is only allowed if the token holder approved.
     function transferFrom(address _from, address _to, uint _value) returns(bool) {
-		if (current() < startTime)  // Check if the crowdsale is already over
-			require(_from == ownerAddr);
+        if (current() < startTime)  // Check if the crowdsale is already over
+            require(_from == ownerAddr);
 
         // prevent the owner of spending his share of tokens for team within the first two year
         if (_from == ownerAddr && current() < lockReleaseDate2year)
@@ -115,16 +115,16 @@ contract LympoToken {
         else if (_from == ecosystemAddr && current() < lockReleaseDate2year)
             require(balances[_from].sub(_value) >= ecoLock13);
 
-		var _allowed = allowed[_from][msg.sender];
-		balances[_from] = balances[_from].sub(_value); // Subtract from the sender
-		balances[_to] = balances[_to].add(_value); // Add the same to the recipient
-		allowed[_from][msg.sender] = _allowed.sub(_value);
-		Transfer(_from, _to, _value);
-		return true;
-	}
+        var _allowed = allowed[_from][msg.sender];
+        balances[_from] = balances[_from].sub(_value); // Subtract from the sender
+        balances[_to] = balances[_to].add(_value); // Add the same to the recipient
+        allowed[_from][msg.sender] = _allowed.sub(_value);
+        Transfer(_from, _to, _value);
+        return true;
+    }
 	
-    //   Approve the passed address to spend the specified amount of tokens
-    //   on behalf of msg.sender.
+    // Approve the passed address to spend the specified amount of tokens
+    // on behalf of msg.sender.
     function approve(address _spender, uint _value) returns (bool) {
         //https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
@@ -133,19 +133,19 @@ contract LympoToken {
         return true;
     }
 
-    //  Called when ICO is closed. Burns the remaining tokens except the tokens reserved:
-    //  Anybody may burn the tokens after ICO ended, but only once (in case the owner holds more tokens in the future).
-    //  this ensures that the owner will not posses a majority of the tokens.
+    // Called when ICO is closed. Burns the remaining tokens except the tokens reserved:
+    // Anybody may burn the tokens after ICO ended, but only once (in case the owner holds more tokens in the future).
+    // this ensures that the owner will not posses a majority of the tokens.
     function burn() {
-		// If tokens have not been burned already and the crowdsale ended
-		if (!burned && current() > startTime) {
+        // If tokens have not been burned already and the crowdsale ended
+        if (!burned && current() > startTime) {
             uint totalReserve = ecosystemReserve.add(teamReserve);
-			uint difference = balances[ownerAddr].sub(totalReserve);
-			balances[ownerAddr] = teamReserve;
+            uint difference = balances[ownerAddr].sub(totalReserve);
+            balances[ownerAddr] = teamReserve;
             balances[ecosystemAddr] = ecosystemReserve;
-			totalSupply = totalSupply.sub(difference);
-			burned = true;
-			Burned(difference);
-		}
-	}
+            totalSupply = totalSupply.sub(difference);
+            burned = true;
+            Burned(difference);
+        }
+    }
 }
