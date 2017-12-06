@@ -69,7 +69,7 @@ contract('ico', accounts => {
                 result = await icoInstance.invest(accounts[2], {value: web3.toWei(300, "ether")});
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
-                let balance = await tokenInstance.balances.call(accounts[2]);
+                let balance = await tokenInstance.balanceOf.call(accounts[2]);
                 assert.equal(balance.toNumber(), 0);
             }
         });
@@ -147,7 +147,7 @@ contract('ico', accounts => {
             let event = result.logs[0].args;
             assert.equal(event.amount.toNumber(), web3.toWei(1, "ether"));
             
-            let token_balance = await tokenInstance.balances.call(accounts[2]);
+            let token_balance = await tokenInstance.balanceOf(accounts[2]);
             assert.equal(token_balance.toNumber(), 36000e18, "token amount doesn't match during pre-ico");
             if (logging) console.log('token amount bought during pre-ico: ' + token_balance.toNumber());
             
@@ -186,7 +186,7 @@ contract('ico', accounts => {
                  result = await icoInstance.invest(accounts[3], {value: web3.toWei(1, "ether")});
                  throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
              } catch (error) {
-                 let balance = await tokenInstance.balances.call(accounts[3]);
+                 let balance = await tokenInstance.balanceOf.call(accounts[3]);
                  assert.equal(balance.toNumber(), 0);
              }
          });
@@ -198,7 +198,7 @@ contract('ico', accounts => {
             let event = result.logs[0].args;
             assert.equal(event.amount.toNumber(), web3.toWei(1, "ether"));
             
-            let token_balance = await tokenInstance.balances.call(accounts[3]);
+            let token_balance = await tokenInstance.balanceOf.call(accounts[3]);
             assert.equal(token_balance.toNumber(), 24000e18, "token amount doesn't match during ico");
             if (logging) console.log('token amount bought during ico: ' + token_balance.toNumber());
             
@@ -218,7 +218,7 @@ contract('ico', accounts => {
                 let result = await icoInstance.invest(accounts[6], {value: web3.toWei(0.0, "ether") });
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
-                let bal = await tokenInstance.balances.call(accounts[6]);
+                let bal = await tokenInstance.balanceOf.call(accounts[6]);
                 assert.equal(bal.toNumber(), 0);
             }
         });
@@ -235,7 +235,7 @@ contract('ico', accounts => {
                 let result0 = await icoInstance.invest(accounts[3], {value: web3.toWei(7500, "ether")});
             
                 
-                let bal_before = await tokenInstance.balances(accounts[0]);
+                let bal_before = await tokenInstance.balanceOf(accounts[0]);
                 if (logging) console.log('bal_before: ' + bal_before);
                 await icoInstance.setCurrent(end+10);
                 await tokenInstance.setCurrent(end+10);
@@ -246,16 +246,16 @@ contract('ico', accounts => {
                 assert.equal(closed, true, "crowdsale should be already closed");
 
                 // check team reserve
-                let reserve = await tokenInstance.balances(accounts[0]);
+                let reserve = await tokenInstance.balanceOf(accounts[0]);
                 if (logging) console.log('reserve: ' + reserve);
                 assert.equal(reserve.toNumber(), teamReserve, "incorrect reserved amount");
                
                 // check advisers reserve
-                let advisers_balance = await tokenInstance.balances(accounts[7]);
+                let advisers_balance = await tokenInstance.balanceOf(accounts[7]);
                 assert.equal(advisers_balance.toNumber(), advisersReserve);
 
                 // check ecosystem reserve
-                let ecosystem_balance = await tokenInstance.balances(accounts[8]);
+                let ecosystem_balance = await tokenInstance.balanceOf(accounts[8]);
                 assert.equal(ecosystem_balance.toNumber(), ecosystemReserve);
                 
                 let supply = await tokenInstance.totalSupply.call();

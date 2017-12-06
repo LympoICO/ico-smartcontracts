@@ -33,7 +33,7 @@ contract LympoToken {
     string constant public name = "Lympo tokens";
     string constant public symbol = "LYM";
     uint8 constant public decimals = 18;
-    uint public totalSupply = 1000000000e18; // Total supply of 1 billion Lympo Tokens
+    uint _totalSupply = 1000000000e18; // Total supply of 1 billion Lympo Tokens
     uint constant public tokensPreICO = 150000000e18; // 15%
     uint constant public tokensICO = 500000000e18; // 50%
     uint constant public teamReserve = 100000000e18; // 10%
@@ -64,13 +64,28 @@ contract LympoToken {
     //------------------------
 	
     // Array with all balances
-    mapping (address => uint) public balances;
-    mapping (address => mapping (address => uint)) public allowed;
+    mapping (address => uint) balances;
+    mapping (address => mapping (address => uint)) allowed;
 
     // Public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed _owner, address indexed spender, uint value);
     event Burned(uint amount);
+
+    // What is the balance of a particular account?
+    function balanceOf(address _owner) constant returns (uint balance) {
+        return balances[_owner];
+    }
+
+    // Returns the amount which _spender is still allowed to withdraw from _owner
+    function allowance(address _owner, address _spender) constant returns (uint remaining) {
+        return allowed[_owner][_spender];
+    }
+
+    // Get the total token supply
+    function totalSupply() constant returns (uint totalSupply) {
+        totalSupply = _totalSupply;
+    }
 
     // Initializes contract with initial supply tokens to the creator of the contract
     function LympoToken(address _ownerAddr, address _advisersAddr, address _ecosystemAddr) {
@@ -79,7 +94,7 @@ contract LympoToken {
         ecosystemAddr = _ecosystemAddr;
         lockReleaseDate1year = startTime + 1 years; // 2019
         lockReleaseDate2year = startTime + 2 years; // 2020
-        balances[ownerAddr] = totalSupply; // Give the owner all initial tokens
+        balances[ownerAddr] = _totalSupply; // Give the owner all initial tokens
     }
 	
     // Send some of your tokens to a given address
@@ -148,7 +163,7 @@ contract LympoToken {
             balances[ownerAddr] = teamReserve;
             balances[advisersAddr] = advisersReserve;
             balances[ecosystemAddr] = ecosystemReserve;
-            totalSupply = totalSupply.sub(difference);
+            _totalSupply = _totalSupply.sub(difference);
             burned = true;
             Burned(difference);
         }

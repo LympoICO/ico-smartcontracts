@@ -21,11 +21,11 @@ contract('token', accounts => {
          
          it("test initialization", async() => {
             await instance.setCurrent(init_time);
-            let balance = await instance.balances.call(accounts[0]);
+            let balance = await instance.balanceOf.call(accounts[0]);
             assert.equal(balance, totalSupply);
-            let bal = await instance.balances.call(accounts[1]);
+            let bal = await instance.balanceOf.call(accounts[1]);
             assert.equal(bal, 0);
-            let allowance = await instance.allowed.call(accounts[0], accounts[1]);
+            let allowance = await instance.allowance.call(accounts[0], accounts[1]);
             assert.equal(allowance, 0);
             let startTime = await instance.startTime.call();
             assert.equal(startTime, start);
@@ -37,7 +37,7 @@ contract('token', accounts => {
             assert.equal(event._owner, accounts[0]);
             assert.equal(event.spender, accounts[1]);
             assert.equal(event.value, 10000e18);
-            let allowed = await instance.allowed.call(accounts[0], accounts[1]);
+            let allowed = await instance.allowance.call(accounts[0], accounts[1]);
             assert.equal(allowed, 10000e18);
         });
          
@@ -51,13 +51,13 @@ contract('token', accounts => {
          
          it("test token allowence: should set allowance to 0 LYM", async() => {
             await instance.approve(accounts[1], 0);
-            let allowed = await instance.allowed.call(accounts[0], accounts[1]);
+            let allowed = await instance.allowance.call(accounts[0], accounts[1]);
             assert.equal(allowed, 0);
         });
          
          it("test token allowence: should set allowance to 20k LYM", async() => {
             await instance.approve(accounts[1], 20000e18);
-            let allowed = await instance.allowed.call(accounts[0], accounts[1]);
+            let allowed = await instance.allowance.call(accounts[0], accounts[1]);
             assert.equal(allowed.toNumber(), 20000e18);
         });
          
@@ -67,11 +67,11 @@ contract('token', accounts => {
             assert.equal(event.from, accounts[0]);
             assert.equal(event.to, accounts[1]);
             assert.equal(event.value, 20000e18);
-            let balance = await instance.balances(accounts[1]);
+            let balance = await instance.balanceOf(accounts[1]);
             assert.equal(balance, 20000e18);
-            let bal = await instance.balances(accounts[0]);
+            let bal = await instance.balanceOf(accounts[0]);
             assert.equal(bal, totalSupply - 20000e18);
-            let allowance = await instance.allowed(accounts[0], accounts[1]);
+            let allowance = await instance.allowance(accounts[0], accounts[1]);
             assert.equal(allowance, 0);
         });
          
@@ -111,9 +111,9 @@ contract('token', accounts => {
             assert.equal(event.from, accounts[1]);
             assert.equal(event.to, accounts[2]);
             assert.equal(event.value,10000e18);
-            let balance = await instance.balances(accounts[2]);
+            let balance = await instance.balanceOf(accounts[2]);
             assert.equal(balance.toNumber(),10000e18);
-            let bal = await instance.balances(accounts[1]);
+            let bal = await instance.balanceOf(accounts[1]);
             assert.equal(bal.toNumber(),10000e18);
         });
          
@@ -132,15 +132,15 @@ contract('token', accounts => {
             assert.equal(event.amount.toNumber(), (tokensICO / 1e18 + tokensPreICO / 1e18 - 20000e18 / 1e18) * 1e18, 'burned'); // burned = all_token_in_ico - (acc1+acc2) tokens
             
             // check team reserve
-            let team_reserved = await instance.balances.call(accounts[0]);
+            let team_reserved = await instance.balanceOf.call(accounts[0]);
             assert.equal(team_reserved.toNumber(), teamReserve);
             
             // check advisers reserve
-            let advisers_balance = await instance.balances.call(accounts[7]);
+            let advisers_balance = await instance.balanceOf.call(accounts[7]);
             assert.equal(advisers_balance.toNumber(), advisersReserve);
             
             // check eco system reserve
-            let ecosystem_balance = await instance.balances.call(accounts[8]);
+            let ecosystem_balance = await instance.balanceOf.call(accounts[8]);
             assert.equal(ecosystem_balance.toNumber(), ecosystemReserve);
             
             let supply = await instance.totalSupply.call();
@@ -163,7 +163,7 @@ contract('token', accounts => {
          it("test token reservation: spend a few tokens from team reserve after 2 years", async() => {
             await instance.setCurrent(start + 31536000 * 2);
             let result = await instance.transfer(accounts[6], 50000000e18);
-            let bal = await instance.balances.call(accounts[6]);
+            let bal = await instance.balanceOf.call(accounts[6]);
             assert.equal(bal.toNumber(),50000000e18);
         });
          
@@ -172,7 +172,7 @@ contract('token', accounts => {
                 let result = await instance.transfer(accounts[6], 110000000e18, {from: owner}); // total 150million and 50million already transfered
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
-                let bal = await instance.balances.call(accounts[6]);
+                let bal = await instance.balanceOf.call(accounts[6]);
                 assert.equal(bal.toNumber(), 50000000e18); // should be still 50million, because we tried to transfer more then reserved
             }
         });
@@ -188,7 +188,7 @@ contract('token', accounts => {
          
          it("test token reservation: should allow to spend 1/3 tokens from eco system reserve in first year", async() => {
             let result = await instance.transfer(accounts[1], ecoLock13, {from: accounts[8]});
-            let bal = await instance.balances.call(accounts[8]);
+            let bal = await instance.balanceOf.call(accounts[8]);
             assert.equal(bal.toNumber(), (ecosystemReserve / 1e18 - ecoLock13 / 1e18) * 1e18);
         });
          
@@ -203,14 +203,14 @@ contract('token', accounts => {
          it("test token reservation: should allow to spend another 1/3 tokens from eco system reserve in second year", async() => {
             await instance.setCurrent(start + 31536000 * 1); // move time a year ahead
             let result = await instance.transfer(accounts[1], ecoLock13, {from: accounts[8]});
-            let bal = await instance.balances.call(accounts[8]);
+            let bal = await instance.balanceOf.call(accounts[8]);
             assert.equal(bal.toNumber(), (ecosystemReserve / 1e18 - ecoLock23 / 1e18) * 1e18);
         });
          
          it("test token reservation: should allow to spend what's from eco system reserve in third year", async() => {
             await instance.setCurrent(start + 31536000 * 2); // move time two years ahead
             let result = await instance.transfer(accounts[1], 73348000e18, {from: accounts[8]});
-            let bal = await instance.balances.call(accounts[8]);
+            let bal = await instance.balanceOf.call(accounts[8]);
             assert.equal(bal.toNumber(), 0);
         });
          
