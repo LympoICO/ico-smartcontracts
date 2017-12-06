@@ -3,7 +3,8 @@ let utils = require('./utils.js')
 let ico = artifacts.require("./LympoICO.sol");
 let token = artifacts.require("./LympoToken.sol");
 
-let teamReserve = 130000000e18; // 13%
+let teamReserve = 100000000e18; // 10%
+let advisersReserve = 30000000e18; // 3%
 let ecosystemReserve = 220000000e18; // 22%
 
 let pre_maxGoal = 150000000e18; // 150 Million LYM Tokens
@@ -20,16 +21,17 @@ let amount_stages = [50000000e18, 80000000e18, 100000000e18];
 
 let tokenStartTime = end;
 let owner = "0x376c9fde9555e9a491c4cd8597ca67bb1bbf397e";
+let advisers_wallet = "0x0cbe666498dd2bb2f85b644b5f882e4136ac9558";
 let ecosystem_wallet = "0xcb88efbfb68a1e6d8a4b0bcf504b6bb6bd623444";
 let tokenInstance, icoInstance;
 
-let logging = true;
+let logging = false;
 let thresholds_turned_off = false; // additional tests without thresholds in invest function
 
 contract('ico', accounts => {
          
          before(async() => {
-                tokenInstance = await token.new(owner, ecosystem_wallet);
+                tokenInstance = await token.new(owner, advisers_wallet, ecosystem_wallet);
                 icoInstance = await ico.new(
                                             tokenInstance.address,
                                             owner,
@@ -213,10 +215,10 @@ contract('ico', accounts => {
          
          it("should fail to buy tokens with too low msg.value", async() => {
             try {
-                let result = await icoInstance.invest(accounts[7], {value: web3.toWei(0.0, "ether") });
+                let result = await icoInstance.invest(accounts[6], {value: web3.toWei(0.0, "ether") });
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
-                let bal = await tokenInstance.balances.call(accounts[7]);
+                let bal = await tokenInstance.balances.call(accounts[6]);
                 assert.equal(bal.toNumber(), 0);
             }
         });
@@ -247,14 +249,18 @@ contract('ico', accounts => {
                 let reserve = await tokenInstance.balances(accounts[0]);
                 if (logging) console.log('reserve: ' + reserve);
                 assert.equal(reserve.toNumber(), teamReserve, "incorrect reserved amount");
-                
+               
+                // check advisers reserve
+                let advisers_balance = await tokenInstance.balances(accounts[7]);
+                assert.equal(advisers_balance.toNumber(), advisersReserve);
+
                 // check ecosystem reserve
-                let ecosystem_balance = await tokenInstance.balances.call(accounts[8]);
+                let ecosystem_balance = await tokenInstance.balances(accounts[8]);
                 assert.equal(ecosystem_balance.toNumber(), ecosystemReserve);
                 
                 let supply = await tokenInstance.totalSupply.call();
                 if (logging) console.log('supply: ' + supply);
-                assert.equal(supply.toNumber(), (teamReserve/1e18 + ecosystemReserve/1e18 + (7500e18 * 24000)/1e18 + 36000e18/1e18 + 24000e18/1e18) * 1e18, "incorrect total supply after burning");
+                assert.equal(supply.toNumber(), (teamReserve/1e18 + advisersReserve/1e18 + ecosystemReserve/1e18 + (7500e18 * 24000)/1e18 + 36000e18/1e18 + 24000e18/1e18) * 1e18, "incorrect total supply after burning");
             });
          
              it("should fund the crowdsale contract from the owner's wallet", async() => {

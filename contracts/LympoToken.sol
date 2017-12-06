@@ -36,7 +36,8 @@ contract LympoToken {
     uint public totalSupply = 1000000000e18; // Total supply of 1 billion Lympo Tokens
     uint constant public tokensPreICO = 150000000e18; // 15%
     uint constant public tokensICO = 500000000e18; // 50%
-    uint constant public teamReserve = 130000000e18; // 13%
+    uint constant public teamReserve = 100000000e18; // 10%
+    uint constant public advisersReserve = 30000000e18; // 3%
     uint constant public ecosystemReserve = 220000000e18; // 22%
     uint constant public ecoLock23 = 146652000e18; // 2/3 of ecosystem reserve
     uint constant public ecoLock13 = 73326000e18; // 1/3 of ecosystem reserve
@@ -45,6 +46,7 @@ contract LympoToken {
     uint public lockReleaseDate2year;
     address public ownerAddr;
     address public ecosystemAddr;
+    address public advisersAddr;
     bool burned;
 
     // ---- FOR TEST ONLY ----
@@ -71,8 +73,9 @@ contract LympoToken {
     event Burned(uint amount);
 
     // Initializes contract with initial supply tokens to the creator of the contract
-    function LympoToken(address _ownerAddr, address _ecosystemAddr) {
+    function LympoToken(address _ownerAddr, address _advisersAddr, address _ecosystemAddr) {
         ownerAddr = _ownerAddr;
+        advisersAddr = _advisersAddr;
         ecosystemAddr = _ecosystemAddr;
         lockReleaseDate1year = startTime + 1 years; // 2019
         lockReleaseDate2year = startTime + 2 years; // 2020
@@ -140,8 +143,10 @@ contract LympoToken {
         // If tokens have not been burned already and the crowdsale ended
         if (!burned && current() > startTime) {
             uint totalReserve = ecosystemReserve.add(teamReserve);
+            totalReserve = totalReserve.add(advisersReserve);
             uint difference = balances[ownerAddr].sub(totalReserve);
             balances[ownerAddr] = teamReserve;
+            balances[advisersAddr] = advisersReserve;
             balances[ecosystemAddr] = ecosystemReserve;
             totalSupply = totalSupply.sub(difference);
             burned = true;

@@ -7,8 +7,9 @@ let init_time = 1508594400;
 let start = 1520899199; // Time after ICO, when tokens became transferable. Monday, 12 March 2018 23:59:59 GMT
 let tokensPreICO = 150000000e18; // 15%
 let tokensICO = 500000000e18; //50%
-let team_reserve = 130000000e18; // 13%
-let ecosystem_reserve = 220000000e18; // 22%
+let teamReserve = 100000000e18; // 10%
+let advisersReserve = 30000000e18; // 3%
+let ecosystemReserve = 220000000e18; // 22%
 let owner = "0x376c9fde9555e9a491c4cd8597ca67bb1bbf397e";
 let ecoLock23 = 146652000e18; // 2/3 of ecosystem reserve
 let ecoLock13 = 73326000e18; // 1/3 of ecosystem reserve
@@ -132,14 +133,18 @@ contract('token', accounts => {
             
             // check team reserve
             let team_reserved = await instance.balances.call(accounts[0]);
-            assert.equal(team_reserved.toNumber(), team_reserve);
+            assert.equal(team_reserved.toNumber(), teamReserve);
+            
+            // check advisers reserve
+            let advisers_balance = await instance.balances.call(accounts[7]);
+            assert.equal(advisers_balance.toNumber(), advisersReserve);
             
             // check eco system reserve
             let ecosystem_balance = await instance.balances.call(accounts[8]);
-            assert.equal(ecosystem_balance.toNumber(), ecosystem_reserve);
+            assert.equal(ecosystem_balance.toNumber(), ecosystemReserve);
             
             let supply = await instance.totalSupply.call();
-            assert.equal(supply.toNumber(), (team_reserve / 1e18 + ecosystem_reserve / 1e18 + 20000e18 / 1e18) * 1e18, 'suppply');
+            assert.equal(supply.toNumber(), (teamReserve / 1e18 + advisersReserve / 1e18 + ecosystemReserve / 1e18 + 20000e18 / 1e18) * 1e18, 'suppply');
         });
          
          it("test token burning: call burn a second time. should do nothing", async() => {
@@ -149,7 +154,7 @@ contract('token', accounts => {
          
          it("test token reservation: should fail spend a few tokens from team reserve (earlier then 2 years after ICO)", async() => {
             try {
-                let result = await instance.transfer(accounts[7], 50000000e18);
+                let result = await instance.transfer(accounts[6], 50000000e18);
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
             }
@@ -157,17 +162,17 @@ contract('token', accounts => {
          
          it("test token reservation: spend a few tokens from team reserve after 2 years", async() => {
             await instance.setCurrent(start + 31536000 * 2);
-            let result = await instance.transfer(accounts[7], 50000000e18);
-            let bal = await instance.balances.call(accounts[7]);
+            let result = await instance.transfer(accounts[6], 50000000e18);
+            let bal = await instance.balances.call(accounts[6]);
             assert.equal(bal.toNumber(),50000000e18);
         });
          
          it("test token reservation: should fail to spend the more then reserve tokens", async() => {
             try {
-                let result = await instance.transfer(accounts[7], 110000000e18, {from: owner}); // total 150million and 50million already transfered
+                let result = await instance.transfer(accounts[6], 110000000e18, {from: owner}); // total 150million and 50million already transfered
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
-                let bal = await instance.balances.call(accounts[7]);
+                let bal = await instance.balances.call(accounts[6]);
                 assert.equal(bal.toNumber(), 50000000e18); // should be still 50million, because we tried to transfer more then reserved
             }
         });
@@ -175,7 +180,7 @@ contract('token', accounts => {
          it("test token reservation: should fail spend all tokens from eco system reserve", async() => {
             await instance.setCurrent(start+10);
             try {
-                let result = await instance.transfer(accounts[8], ecosystem_reserve, {from: accounts[1]});
+                let result = await instance.transfer(accounts[8], ecosystemReserve, {from: accounts[1]});
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
             }
@@ -184,7 +189,7 @@ contract('token', accounts => {
          it("test token reservation: should allow to spend 1/3 tokens from eco system reserve in first year", async() => {
             let result = await instance.transfer(accounts[1], ecoLock13, {from: accounts[8]});
             let bal = await instance.balances.call(accounts[8]);
-            assert.equal(bal.toNumber(), (ecosystem_reserve / 1e18 - ecoLock13 / 1e18) * 1e18);
+            assert.equal(bal.toNumber(), (ecosystemReserve / 1e18 - ecoLock13 / 1e18) * 1e18);
         });
          
          it("test token reservation: should fail spend more tokens from eco system reserve in first year", async() => {
@@ -199,7 +204,7 @@ contract('token', accounts => {
             await instance.setCurrent(start + 31536000 * 1); // move time a year ahead
             let result = await instance.transfer(accounts[1], ecoLock13, {from: accounts[8]});
             let bal = await instance.balances.call(accounts[8]);
-            assert.equal(bal.toNumber(), (ecosystem_reserve / 1e18 - ecoLock23 / 1e18) * 1e18);
+            assert.equal(bal.toNumber(), (ecosystemReserve / 1e18 - ecoLock23 / 1e18) * 1e18);
         });
          
          it("test token reservation: should allow to spend what's from eco system reserve in third year", async() => {
