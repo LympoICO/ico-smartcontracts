@@ -117,6 +117,7 @@ contract LympoICO {
         bool isPreICO = (current() >= pre_start && current() <= pre_end);
         bool isICO = (current() >= start && current() <= end);
 
+        require(isPreICO || isICO);
         require(numTokens > 0);
         if (isPreICO)
         {
