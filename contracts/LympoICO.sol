@@ -1,7 +1,7 @@
 /*
  *  Crowdsale for Lympo Tokens.
  *  Raised Ether will be stored safely at the wallet and returned to the ICO in case the funding
- *  goal is not reached, allowing the investors to withdraw their funds.
+ *  goal is not reached, allowing the token holders to withdraw their funds.
  *  Author: Justas Kregždė
  */
  
@@ -60,11 +60,11 @@ contract LympoICO {
     // The number of tokens already sold during ICO
     uint public tokensSold = 0;
 
-    // If the funding goal is not reached, investors may withdraw their funds
+    // If the funding goal is not reached, token holders may withdraw their funds
     uint constant public fundingGoal = pre_maxGoal; // pre-ICO amount
     // How much has been raised by crowdale (in ETH)
     uint public amountRaised;
-    // The balances (in ETH) of all investors 
+    // The balances (in ETH) of all token holders
     mapping(address => uint) public balances;
     // Indicates if the crowdsale has been ended already
     bool public crowdsaleEnded = false;
@@ -100,16 +100,16 @@ contract LympoICO {
         tokenOwner = tokenOwnerAddr;
     }
     
-    // Invest by sending ether to the contract.
+    // Exchange by sending ether to the contract.
     function() payable {
-        if (msg.sender != wallet) // Do not trigger investment if the wallet is returning the funds
-            invest(msg.sender);
+        if (msg.sender != wallet) // Do not trigger exchange if the wallet is returning the funds
+            exchange(msg.sender);
     }
     
-    // Make an investment. Only callable if the crowdsale started and hasn't been ended, also the maxGoal wasn't reached yet.
+    // Make an exchanegment. Only callable if the crowdsale started and hasn't been ended, also the maxGoal wasn't reached yet.
     // The current token price is looked up by available amount. Bought tokens is transfered to the receiver.
     // The sent value is directly forwarded to a safe wallet.
-    function invest(address receiver) payable {
+    function exchange(address receiver) payable {
         uint amount = msg.value;
         uint price = getPrice();
         uint numTokens = amount.mul(price);

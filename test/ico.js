@@ -26,7 +26,7 @@ let ecosystem_wallet = "0xcb88efbfb68a1e6d8a4b0bcf504b6bb6bd623444";
 let tokenInstance, icoInstance;
 
 let logging = false;
-let thresholds_turned_off = false; // additional tests without thresholds in invest function
+let thresholds_turned_off = false; // additional tests without thresholds in exchange function
 
 contract('ico', accounts => {
          
@@ -66,7 +66,7 @@ contract('ico', accounts => {
          it("should fail to buy tokens, because too early", async() => {
             let result;
             try {
-                result = await icoInstance.invest(accounts[2], {value: web3.toWei(300, "ether")});
+                result = await icoInstance.exchange(accounts[2], {value: web3.toWei(300, "ether")});
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
                 let balance = await tokenInstance.balanceOf.call(accounts[2]);
@@ -143,7 +143,7 @@ contract('ico', accounts => {
          it("should buy some LYM during pre-ICO", async() => {
             await icoInstance.setCurrent(pre_start);
             let approve_result = await tokenInstance.approve(icoInstance.address, pre_maxGoal+maxGoal);
-            let result = await icoInstance.invest(accounts[2], {value: web3.toWei(1, "ether")});
+            let result = await icoInstance.exchange(accounts[2], {value: web3.toWei(1, "ether")});
             let event = result.logs[0].args;
             assert.equal(event.amount.toNumber(), web3.toWei(1, "ether"));
             
@@ -167,7 +167,7 @@ contract('ico', accounts => {
              it("should buy LYM during pre-ICO, bought too much and fail", async() => {
                 let result;
                 try {
-                    result = await icoInstance.invest(accounts[2], {value: web3.toWei(2000, "ether")});
+                    result = await icoInstance.exchange(accounts[2], {value: web3.toWei(2000, "ether")});
                     throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
                 } catch (error) {
                     let token_sold = await icoInstance.tokensSold.call();
@@ -183,7 +183,7 @@ contract('ico', accounts => {
              await icoInstance.setCurrent(pre_end + 1);
              let result;
              try {
-                 result = await icoInstance.invest(accounts[3], {value: web3.toWei(1, "ether")});
+                 result = await icoInstance.exchange(accounts[3], {value: web3.toWei(1, "ether")});
                  throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
              } catch (error) {
                  let balance = await tokenInstance.balanceOf.call(accounts[3]);
@@ -194,7 +194,7 @@ contract('ico', accounts => {
          
          it("should buy some LYM during ICO", async() => {
             await icoInstance.setCurrent(start);
-            let result = await icoInstance.invest(accounts[3], {value: web3.toWei(1, "ether")});
+            let result = await icoInstance.exchange(accounts[3], {value: web3.toWei(1, "ether")});
             let event = result.logs[0].args;
             assert.equal(event.amount.toNumber(), web3.toWei(1, "ether"));
             
@@ -215,7 +215,7 @@ contract('ico', accounts => {
          
          it("should fail to buy tokens with too low msg.value", async() => {
             try {
-                let result = await icoInstance.invest(accounts[6], {value: web3.toWei(0.0, "ether") });
+                let result = await icoInstance.exchange(accounts[6], {value: web3.toWei(0.0, "ether") });
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
             } catch (error) {
                 let bal = await tokenInstance.balanceOf.call(accounts[6]);
@@ -232,7 +232,7 @@ contract('ico', accounts => {
          if (thresholds_turned_off)
          {
             it("should close the crowdsale. goal should be reached. Should burn unsold tokens.", async() => {
-                let result0 = await icoInstance.invest(accounts[3], {value: web3.toWei(7500, "ether")});
+                let result0 = await icoInstance.exchange(accounts[3], {value: web3.toWei(7500, "ether")});
             
                 
                 let bal_before = await tokenInstance.balanceOf(accounts[0]);
@@ -268,7 +268,7 @@ contract('ico', accounts => {
                 assert.equal(web3.eth.getBalance(icoInstance.address).toNumber(), web3.toWei(20000, "ether"));
             });
          
-             it("should withdraw the invested amount", async() => {
+             it("should withdraw the exchanged amount", async() => {
                 let bal_before = await icoInstance.balances.call(accounts[2]);
                 if (logging) console.log('bal_before: ' + bal_before);
                 let result = await icoInstance.safeWithdrawal({from: accounts[2]});
