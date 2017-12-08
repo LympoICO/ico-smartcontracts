@@ -164,7 +164,7 @@ contract LympoICO {
             }
             return prices[prices.length-1];
         }
-        //return prices[prices.length-1]; // eliminate warning
+        return prices[prices.length-1]; //should never be returned, but to be sure to not divide by 0
     }
 
     modifier afterDeadline() { if (current() >= end) _; }
