@@ -38,8 +38,8 @@ contract LympoICO {
     // The maximum amount of tokens to be sold during pre-ICO
     uint constant public pre_maxGoal = 150000000e18; // 150 Million LYM Tokens
     // There are different prices and amount available in each period
-    uint[4] public pre_prices = [36000, 33000, 31500, 30000];
-    uint[3] public pre_amount_stages = [30000000e18, 50000000e18, 60000000e18]; // the amount available in each stage
+    uint[3] public pre_prices = [36000, 33000, 30000];
+    uint[2] public pre_amount_stages = [30000000e18, 50000000e18]; // the amount available in each stage
     // The start date of the pre-ICO crowdsale
     uint constant public pre_start = 1513252800; // Thursday, 14 December 2017 12:00:00 GMT
     // The end date of the pre-ICO crowdsale
@@ -51,8 +51,8 @@ contract LympoICO {
     // The maximum amount of tokens to be sold
     uint constant public maxGoal = 500000000e18; // 500 Million LYM Tokens
     // There are different prices and amount available in each period
-    uint[4] public prices = [24000, 22000, 21000, 20000];
-    uint[3] public amount_stages = [50000000e18, 80000000e18, 100000000e18]; // the amount available in each stage
+    uint[2] public prices = [24000, 20000];
+    uint[1] public amount_stages = [80000000e18]; // the amount available in each stage
     // The start date of the crowdsale
     uint constant public start = 1519819200; // Wednesday, 28 February 2018 12:00:00 GMT
     // The end date of the crowdsale

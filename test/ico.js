@@ -10,14 +10,14 @@ let ecosystemReserve = 220000000e18; // 22%
 let pre_maxGoal = 150000000e18; // 150 Million LYM Tokens
 let pre_start = 1513252800; // Thursday, 14 December 2017 12:00:00 GMT
 let pre_end = 1514073599; // Saturday, 23 December 2017 23:59:59 GMT
-let pre_prices = [36000, 33000, 31500, 30000];
-let pre_amount_stages = [30000000e18, 50000000e18, 60000000e18];
+let pre_prices = [36000, 33000, 30000];
+let pre_amount_stages = [30000000e18, 50000000e18];
 
 let maxGoal = 500000000e18; // 500 Million LYM Tokens
 let start = 1519819200; // Wednesday, 28 February 2018 12:00:00 GMT
 let end = 1520899199; // Monday, 12 March 2018 23:59:59 GMT
-let prices = [24000, 22000, 21000, 20000];
-let amount_stages = [50000000e18, 80000000e18, 100000000e18];
+let prices = [24000, 20000];
+let amount_stages = [80000000e18];
 
 let tokenStartTime = end;
 let owner = "0x376c9fde9555e9a491c4cd8597ca67bb1bbf397e";
@@ -82,29 +82,16 @@ contract('ico', accounts => {
              if (logging) console.log('current pre-ico price: ' + pre_price.toNumber());
              assert.equal(pre_price.toNumber(), pre_prices[0], "current pre-price is incorrect");
              
-             let pre_price0 = await icoInstance.pre_prices.call(0);
-             if (logging) console.log('price[0]: ' + pre_price0.toNumber());
-             assert.equal(pre_price0.toNumber(), pre_prices[0], "pre_prices[0] is incorrect");
-             
-             let pre_price1 = await icoInstance.pre_prices.call(1);
-             if (logging) console.log('price[1]: ' + pre_price1.toNumber());
-             assert.equal(pre_price1.toNumber(), pre_prices[1], "pre_prices[1] is incorrect");
-             
-             let pre_prices2 = await icoInstance.pre_prices.call(2);
-             if (logging) console.log('price[2]: ' + pre_prices2.toNumber());
-             assert.equal(pre_prices2.toNumber(), pre_prices[2], "pre_prices[2] is incorrect");
-             
-             let pre_amount0 = await icoInstance.pre_amount_stages.call(0);
-             if (logging) console.log('amount_stages[0]: ' + pre_amount0.toNumber());
-             assert.equal(pre_amount0.toNumber(), pre_amount_stages[0], "pre_amount_stages[0] is incorrect");
-             
-             let pre_amount1 = await icoInstance.pre_amount_stages.call(1);
-             if (logging) console.log('amount_stages[1]: ' + pre_amount1.toNumber());
-             assert.equal(pre_amount1.toNumber(), pre_amount_stages[1], "pre_amount_stages[1] is incorrect");
-             
-             let pre_amount2 = await icoInstance.pre_amount_stages.call(2);
-             if (logging) console.log('amount_stages[2]: ' + pre_amount2.toNumber());
-             assert.equal(pre_amount2.toNumber(), pre_amount_stages[2], "pre_amount_stages[2] is incorrect");
+             for (i = 0; i < pre_prices.length; i++) {
+                let pre_price = await icoInstance.pre_prices.call(i);
+                if (logging) console.log("price["+ i + "]: " + pre_price.toNumber());
+                assert.equal(pre_price.toNumber(), pre_prices[i], "pre_prices["+i+"] is incorrect");
+             }
+             for (i = 0; i < pre_amount_stages.length; i++) {
+                let pre_amount = await icoInstance.pre_amount_stages.call(i);
+                if (logging) console.log("pre_amount_stages["+ i + "]: " + pre_amount.toNumber());
+                assert.equal(pre_amount.toNumber(), pre_amount_stages[i], "pre_amount_stages["+i+"] is incorrect");
+             }
              
              await icoInstance.setCurrent(start+10);
              
@@ -114,29 +101,16 @@ contract('ico', accounts => {
              if (logging) console.log('current price: ' + price.toNumber());
              assert.equal(price.toNumber(), prices[0], "current price is incorrect");
              
-             let price0 = await icoInstance.prices.call(0);
-             if (logging) console.log('price[0]: ' + price0.toNumber());
-             assert.equal(price0.toNumber(), prices[0], "price[0] is incorrect");
-             
-             let price1 = await icoInstance.prices.call(1);
-             if (logging) console.log('price[1]: ' + price1.toNumber());
-             assert.equal(price1.toNumber(), prices[1], "price[1] is incorrect");
-             
-             let prices2 = await icoInstance.prices.call(2);
-             if (logging) console.log('price[2]: ' + prices2.toNumber());
-             assert.equal(prices2.toNumber(), prices[2], "price[2] is incorrect");
-             
-             let amount0 = await icoInstance.amount_stages.call(0);
-             if (logging) console.log('amount_stages[0]: ' + amount0.toNumber());
-             assert.equal(amount0.toNumber(), amount_stages[0], "amount[0] is incorrect");
-             
-             let amount1 = await icoInstance.amount_stages.call(1);
-             if (logging) console.log('amount_stages[1]: ' + amount1.toNumber());
-             assert.equal(amount1.toNumber(), amount_stages[1], "amount[1] is incorrect");
-             
-             let amount2 = await icoInstance.amount_stages.call(2);
-             if (logging) console.log('amount_stages[2]: ' + amount2.toNumber());
-             assert.equal(amount2.toNumber(), amount_stages[2], "amount[2] is incorrect");
+             for (i = 0; i < prices.length; i++) {
+                let price = await icoInstance.prices.call(i);
+                if (logging) console.log("price["+ i + "]: " + price.toNumber());
+                assert.equal(price.toNumber(), prices[i], "prices["+i+"] is incorrect");
+             }
+             for (i = 0; i < amount_stages.length; i++) {
+                let amount = await icoInstance.amount_stages.call(i);
+                if (logging) console.log("amount["+ i + "]: " + amount.toNumber());
+                assert.equal(amount.toNumber(), amount_stages[i], "amount["+i+"] is incorrect");
+             }
          });
          
          
