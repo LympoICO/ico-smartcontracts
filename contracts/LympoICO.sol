@@ -145,16 +145,6 @@ contract LympoICO {
         FundTransfer(receiver, amount, true, amountRaised);
     }
 
-    // Manual exchange tokens for BTC,LTC,Fiat contributions.
-    // @param receiver who tokens will go to.
-    // @param value an amount of tokens.
-    function manualExchange(address receiver, uint value) {
-        require(msg.sender == tokenOwner);
-        require(tokensSold.add(value) <= maxGoal);
-        tokensSold = tokensSold.add(value);
-        assert(tokenReward.transferFrom(tokenOwner, receiver, value));
-    }
-
     // Looks up the current token price
     function getPrice() constant returns (uint price) {
         // pre-ICO prices
