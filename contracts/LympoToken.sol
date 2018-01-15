@@ -34,14 +34,14 @@ contract LympoToken {
     string constant public symbol = "LYM";
     uint8 constant public decimals = 18;
     uint _totalSupply = 1000000000e18; // Total supply of 1 billion Lympo Tokens
-    uint constant public tokensPreICO = 150000000e18; // 15%
-    uint constant public tokensICO = 500000000e18; // 50%
+    uint constant public tokensPreICO = 265000000e18; // 26.5%
+    uint constant public tokensICO = 385000000e18; // 38.5%
     uint constant public teamReserve = 100000000e18; // 10%
     uint constant public advisersReserve = 30000000e18; // 3%
     uint constant public ecosystemReserve = 220000000e18; // 22%
     uint constant public ecoLock23 = 146652000e18; // 2/3 of ecosystem reserve
     uint constant public ecoLock13 = 73326000e18; // 1/3 of ecosystem reserve
-    uint constant public startTime = 1520899199; // Time after ICO, when tokens became transferable. Monday, 12 March 2018 23:59:59 GMT
+    uint constant public startTime = 1519815600; // Time after ICO, when tokens became transferable. Wednesday, 28 February 2018 11:00:00 GMT
     uint public lockReleaseDate1year;
     uint public lockReleaseDate2year;
     address public ownerAddr;

@@ -3,10 +3,10 @@ let utils = require('./utils.js')
 let token = artifacts.require("./LympoToken.sol");
 let instance;
 let totalSupply = 1000000000e18;
-let init_time = 1508594400;
-let start = 1520899199; // Time after ICO, when tokens became transferable. Monday, 12 March 2018 23:59:59 GMT
-let tokensPreICO = 150000000e18; // 15%
-let tokensICO = 500000000e18; //50%
+let init_time = 1516618800;
+let start = 1519815600; // Time after ICO, when tokens became transferable. Wednesday, 28 February 2018 11:00:00 GMT
+let tokensPreICO = 265000000e18; // 26.5%
+let tokensICO = 385000000e18; //38.5%
 let teamReserve = 100000000e18; // 10%
 let advisersReserve = 30000000e18; // 3%
 let ecosystemReserve = 220000000e18; // 22%

@@ -7,17 +7,16 @@ let teamReserve = 100000000e18; // 10%
 let advisersReserve = 30000000e18; // 3%
 let ecosystemReserve = 220000000e18; // 22%
 
-let pre_maxGoal = 150000000e18; // 150 Million LYM Tokens
-let pre_start = 1513252800; // Thursday, 14 December 2017 12:00:00 GMT
-let pre_end = 1514073599; // Saturday, 23 December 2017 23:59:59 GMT
-let pre_prices = [36000, 33000, 30000];
-let pre_amount_stages = [30000000e18, 50000000e18];
+let pre_maxGoal = 265000000e18; // 265 Million LYM Tokens
+let pre_start = 1516618800; // Monday, 22 January 2018 11:00:00 GMT
+let pre_end = 1517655600; // Saturday, 3 February 2018 11:00:00 GMT
+let pre_prices = [60000, 50000];
+let pre_amount_stages = [90000000e18];
 
-let maxGoal = 500000000e18; // 500 Million LYM Tokens
-let start = 1519819200; // Wednesday, 28 February 2018 12:00:00 GMT
-let end = 1520899199; // Monday, 12 March 2018 23:59:59 GMT
-let prices = [24000, 20000];
-let amount_stages = [80000000e18];
+let maxGoal = 385000000e18; // 385 Million LYM Tokens
+let start = 1518865200; // Saturday, 17 February 2018 11:00:00 GMT
+let end = 1519815600; // Wednesday, 28 February 2018 11:00:00 GMT
+let prices = [40000];
 
 let tokenStartTime = end;
 let owner = "0x376c9fde9555e9a491c4cd8597ca67bb1bbf397e";
@@ -106,11 +105,13 @@ contract('ico', accounts => {
                 if (logging) console.log("price["+ i + "]: " + price.toNumber());
                 assert.equal(price.toNumber(), prices[i], "prices["+i+"] is incorrect");
              }
+             /*
              for (i = 0; i < amount_stages.length; i++) {
                 let amount = await icoInstance.amount_stages.call(i);
                 if (logging) console.log("amount["+ i + "]: " + amount.toNumber());
                 assert.equal(amount.toNumber(), amount_stages[i], "amount["+i+"] is incorrect");
              }
+              */
          });
          
          
@@ -122,7 +123,7 @@ contract('ico', accounts => {
             assert.equal(event.amount.toNumber(), web3.toWei(1, "ether"));
             
             let token_balance = await tokenInstance.balanceOf(accounts[2]);
-            assert.equal(token_balance.toNumber(), 36000e18, "token amount doesn't match during pre-ico");
+            assert.equal(token_balance.toNumber(), pre_prices[0]*1e18, "token amount doesn't match during pre-ico");
             if (logging) console.log('token amount bought during pre-ico: ' + token_balance.toNumber());
             
             let amount_balance = await icoInstance.balances.call(accounts[2]);
@@ -173,7 +174,7 @@ contract('ico', accounts => {
             assert.equal(event.amount.toNumber(), web3.toWei(1, "ether"));
             
             let token_balance = await tokenInstance.balanceOf.call(accounts[3]);
-            assert.equal(token_balance.toNumber(), 24000e18, "token amount doesn't match during ico");
+            assert.equal(token_balance.toNumber(), prices[0]*1e18, "token amount doesn't match during ico");
             if (logging) console.log('token amount bought during ico: ' + token_balance.toNumber());
             
             let amount_balance = await icoInstance.balances.call(accounts[3]);
@@ -234,7 +235,7 @@ contract('ico', accounts => {
                 
                 let supply = await tokenInstance.totalSupply.call();
                 if (logging) console.log('supply: ' + supply);
-                assert.equal(supply.toNumber(), (teamReserve/1e18 + advisersReserve/1e18 + ecosystemReserve/1e18 + (7500e18 * 24000)/1e18 + 36000e18/1e18 + 24000e18/1e18) * 1e18, "incorrect total supply after burning");
+                assert.equal(supply.toNumber(), (teamReserve/1e18 + advisersReserve/1e18 + ecosystemReserve/1e18 + (7500e18 * prices[0])/1e18 + pre_prices[0] + prices[0]) * 1e18, "incorrect total supply after burning");
             });
          
              it("should fund the crowdsale contract from the owner's wallet", async() => {
